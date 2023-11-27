@@ -54,6 +54,10 @@ def var_est(
     return (1 / (n - p)) * np.linalg.norm(Y_true - Y_pred)**2
 
 
+def L2_loss(Y_true, Y_pred):
+    return np.linalg.norm(Y_true - Y_pred)**2
+
+
 def build_covariates(X_full, Y_true, permute: bool = False):
     Data = data_split(X_full, Y_true, permute)
     X_D1 = Data["D1"]["D1_X"]
@@ -63,7 +67,7 @@ def build_covariates(X_full, Y_true, permute: bool = False):
 
     X0_D1 = np.ones(shape=(X_D1.shape))
     X1_D1 = X_D1[:, :1]
-    X2_D1 = X_D1[:, :2]
+    # X2_D1 = X_D1[:, :2]
     X3_D1 = X_D1[:, :3]
     X4_D1 = X_D1[:, :4]
     X5_D1 = X_D1[:, :5]
@@ -75,7 +79,7 @@ def build_covariates(X_full, Y_true, permute: bool = False):
 
     X0_D2 = np.ones(shape=(100, 1))
     X1_D2 = X_D2[:, :1]
-    X2_D2 = X_D2[:, :2]
+    # X2_D2 = X_D2[:, :2]
     X3_D2 = X_D2[:, :3]
     X4_D2 = X_D2[:, :4]
     X5_D2 = X_D2[:, :5]
@@ -86,12 +90,16 @@ def build_covariates(X_full, Y_true, permute: bool = False):
     X10_D2 = X_D2[:, :10]
 
     covariates_D1 = [
-            X0_D1, X1_D1, X2_D1, X3_D1, X4_D1, X5_D1,
-            X6_D1, X7_D1, X8_D1, X9_D1, X10_D1
+            X0_D1, X1_D1, #X2_D1, 
+            X3_D1, X4_D1, X5_D1,
+            X6_D1, X7_D1, X8_D1, 
+            X9_D1, X10_D1
             ]
     covariates_D2 = [
-            X0_D2, X1_D2, X2_D2, X3_D2, X4_D2, X5_D2,
-            X6_D2, X7_D2, X8_D2, X9_D2, X10_D2
+            X0_D2, X1_D2, #X2_D2,
+            X3_D2, X4_D2, X5_D2,
+            X6_D2, X7_D2, X8_D2, 
+            X9_D2, X10_D2
             ]
     candidate_models = [
             [0, 0, LinearRegression(), 0] for Xj in covariates_D1
@@ -130,3 +138,14 @@ def retrain_models(X_new, Y_new, chosen_models):
         model[1] = var_est(Y_new, model[0].predict(Xj), n_j, p_j)
 
     return chosen_models
+
+
+def final_model_preds(final_model, covariates, Y_true):
+    Y_preds = [
+        mod[2] * mod[1].predict(covariates[mod[0]]) for mod in final_model
+        ]
+    final_model_preds = np.zeros(Y_true.shape)
+    for preds_j in Y_preds:
+        final_model_preds += preds_j
+
+    return final_model_preds

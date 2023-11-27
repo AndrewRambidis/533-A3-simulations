@@ -50,9 +50,11 @@ def ARMS_screening(
                           for item in BIC_ordered_models]
 
     chosen_models = [*AIC_ordered_models, *BIC_ordered_models]
+    best_AIC = AIC_ordered_models[0]
+    best_BIC = BIC_ordered_models[0]
 
     # return chosen candidates
-    return chosen_models
+    return chosen_models, best_AIC, best_BIC
 
 
 def ARMS_iter(
@@ -102,11 +104,12 @@ def ARMS(
         X_full, Y_true, permute=False
         )
     # perform screening stage
-    chosen_models = ARMS_screening(D1[0], D1[1], candidate_models, m)
+    chosen_models, best_AIC, best_BIC = ARMS_screening(
+        D1[0], D1[1], candidate_models, m
+        )
 
     # aggregate the model weights to get final weight for model j
     aggregate_model_weights = [[mod[2], 0] for mod in chosen_models]
-
     for j in range(N-1):
         weights_j = ARMS_iter(D2[0], D2[1], chosen_models, X_full.shape[0])
         for i, agg_weight in enumerate(aggregate_model_weights):
@@ -118,6 +121,9 @@ def ARMS(
 
         chosen_models = retrain_models(D1[0], D1[1], chosen_models)
 
+    # divide summed weights by N
+    aggregate_model_weights = [[w[0], w[1]/N] for w in aggregate_model_weights]
+
     # compute final model
     covariates = full_covariates(X_full)
     final_model = retrain_models(covariates, Y_true, chosen_models)
@@ -126,4 +132,4 @@ def ARMS(
         Wj_hat = aggregate_model_weights[j][1]
         model.append(Wj_hat)
 
-    return final_model, covariates
+    return final_model, covariates, best_AIC, best_BIC
