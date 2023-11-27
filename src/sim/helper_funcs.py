@@ -5,7 +5,6 @@ from sklearn.utils import shuffle
 from sklearn.linear_model import LinearRegression
 
 
-
 def data_generation(
         n: np.int32,
         p: np.int32,
@@ -18,9 +17,10 @@ def data_generation(
     # in paper: n = 1000, p = 10, sigma^2 in [0.1, 0.5, 1.0, 2.25, 4.0]
     X = np.random.uniform(-1, 1, size=(n, p))
     e = np.random.normal(0, std, n).reshape(-1, 1)
-    Y = X @ true_betas + np.full(shape=(n,1), fill_value=intercept) + e
+    Y = X @ true_betas + np.full(shape=(n, 1), fill_value=intercept) + e
 
     return [X, Y]
+
 
 def data_split(
         X: npt.NDArray[np.float32],

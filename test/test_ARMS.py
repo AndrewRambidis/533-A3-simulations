@@ -3,7 +3,6 @@ import numpy as np
 
 from src.sim.ARMS import ARMS
 from src.sim.helper_funcs import data_generation
-from src.sim.model_selection import MSE
 
 
 class testARMS(unittest.TestCase):
@@ -21,7 +20,9 @@ class testARMS(unittest.TestCase):
 
         final_model, covariates = ARMS(X_full, Y_true, 5, 3)
 
-        Y_preds = [mod[2] * mod[1].predict(covariates[mod[0]]) for mod in final_model]
+        Y_preds = [
+            mod[2] * mod[1].predict(covariates[mod[0]]) for mod in final_model
+            ]
         final_model_preds = np.zeros(Y_true.shape)
         for preds_j in Y_preds:
             final_model_preds += preds_j
@@ -29,4 +30,3 @@ class testARMS(unittest.TestCase):
         print(final_model_preds.shape)
         print(np.concatenate((final_model_preds, Y_true), axis=1))
         print(Y_true - final_model_preds)
-

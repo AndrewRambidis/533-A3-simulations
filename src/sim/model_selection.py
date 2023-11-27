@@ -17,6 +17,7 @@ def OLS_AIC(
         ) -> list[float, float]:
     return n * np.log(MSE(Y_true, Y_pred)) + 2 * p
 
+
 def OLS_BIC(
     Y_true: npt.NDArray[np.float32],
     Y_pred: npt.NDArray[np.float32],

@@ -12,9 +12,10 @@ def ARMS_screening(
         X: list[npt.NDArray[np.float32]],
         Y: npt.NDArray[np.float32],
         candidate_models: list[list],
-        m: np.int32 
+        m: np.int32
         ) -> list:
-    # candidate_models: [[AIC_1, BIC_1, M1, var_est_1], ..., [AIC_K, BIC_K, MK, var_est_K]]
+    # candidate_models: [[AIC_1, BIC_1, M1, var_est_1],
+    # ..., [AIC_K, BIC_K, MK, var_est_K]]
     # find estimates for each candidate models
     for j in range(len(candidate_models)):
         n_j = X[j].shape[0]
@@ -27,7 +28,7 @@ def ARMS_screening(
         candidate_models[j][1] = OLS_BIC(
             Y, candidate_models[j][2].predict(X[j]), n_j, p_j
             )
-    
+
     # calculating estimated error variance
     for j, model in enumerate(candidate_models):
         n_j = X[j].shape[0]
@@ -81,7 +82,8 @@ def ARMS_iter(
 
     # calculate weights
     for j, mod_j in enumerate(chosen_models):
-        W_j = np.sqrt(mod_j[1])**(-n_total / 2) * np.exp(-np.sqrt(mod_j[1])**(-2) * (discrepancy[j] / 2)) \
+        W_j = np.sqrt(mod_j[1])**(-n_total / 2) \
+            * np.exp(-np.sqrt(mod_j[1])**(-2) * (discrepancy[j] / 2)) \
             / weight_denom
         model_weights.append(W_j)
 
